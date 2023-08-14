@@ -1,74 +1,46 @@
 <script lang="ts">
-	import NextStep from '$lib/components/NextStep.svelte';
-	import { trpc } from '$lib/trpc';
+	import { goto } from '$app/navigation';
+	import { quizType } from '$lib/types/types';
+	import { page } from '$app/stores'
 
-	const greeting = trpc.greeting.query({ name: 'the o7 stack' });
+
+	const keys = Object.keys(quizType);
+	let type: string;
+	let difficulty: string;
+	const toSend = new URL(`${$page.url.href}play`)
+	function handleSubmit(){
+		toSend.searchParams.set("type", type)
+		toSend.searchParams.set("diff", difficulty)
+		goto(toSend)
+	}
 </script>
 
 <main class="flex h-screen flex-col items-center justify-center">
-	<img src="/favicon.png" class="w-32" alt="o7 Logo" />
-	<!--
-		Notice how there's no flash of `undefined` here: that's because of the
-		SSR in `+page.server.ts`! Try changing the `name` to see the difference.
-	-->
-	<h1 class="text-3xl font-bold">{$greeting.data}</h1>
-	<h2 class="my-6 text-2xl">Next Steps:</h2>
-	<div class="flex max-w-5xl justify-center gap-4 px-3">
-		<NextStep
-			title="Edit this page"
-			learnMore="https://svelte.dev/tutorial/basics"
-		>
-			<p>
-				Edit <code class="text-lime-300">src/routes/+page.svelte</code> to see your
-				changes live.
-			</p>
-			<p>
-				The source for these cards is in <code class="text-lime-300"
-					>src/lib/components/NextStep.svelte</code
-				>.
-			</p>
-			<p>
-				There's some global styling in <code class="text-lime-300"
-					>src/app.css</code
-				>.
-			</p>
-		</NextStep>
-		<NextStep
-			title="Work on your database schema"
-			learnMore="https://www.prisma.io/docs/concepts/components/prisma-schema"
-		>
-			<p>
-				Write a Prisma schema in <code class="text-red-300"
-					>prisma/schema.prisma</code
-				>.
-			</p>
-			<p>
-				Run <code class="text-red-300">pnpm db:push</code> to update your database
-				typings.
-			</p>
-			<p>
-				Remember that you're using <a
-					href="https://github.com/kysely-org/kysely"
-					target="_blank"
-					class="text-blue-400 hover:underline">Kysely</a
-				>
-				instead of Prisma to make your queries, and
-				<code class="text-red-300">import {'{ db }'} from '$lib/db'</code>!
-			</p>
-		</NextStep>
-		<NextStep title="Create some tRPC routes" learnMore="https://trpc.io">
-			<p>
-				There's an example query in <code class="text-purple-300"
-					>src/lib/server/routes/_app.ts</code
-				>.
-			</p>
-			<p>
-				Also take a look at <code class="text-purple-300">
-					src/routes/+page.server.ts</code
-				> to see how server-side rendering works!
-			</p>
-		</NextStep>
-	</div>
+	<h2 class="my-6 text-4xl">Quizzicle</h2>
+	<form on:submit|preventDefault={handleSubmit}>
+		<div class="flex max-w-5xl justify-center gap-4 px-3">
+			<h1>Select Quiz Type</h1>
+			<select bind:value={type}>
+				<option value="any">Any</option>
+				{#each keys as type}
+					<!-- @ts-ignore -->
+					<option value={quizType[type]}>{type}</option>
+				{/each}
+			</select>
+		</div>
+		<div class="flex max-w-5xl justify-center gap-4 px-3 pt-5">
+			<h1>Select Quiz Difficulty</h1>
+			<select bind:value={difficulty}>
+				<option value="any">Any</option>
+				<option value="easy">Easy</option>
+				<option value="medium">Medium</option>
+				<option value="hard">Hard</option>
+			</select>
+		</div>
+		<div class="flex max-w-5xl justify-center gap-4 px-3 pt-5">
+			<input type="submit" class="h-10 px-5 text-indigo-700 transition-colors duration-150 border border-indigo-500 rounded-lg focus:shadow-outline hover:bg-indigo-500 hover:text-indigo-100" value="Go!"/>
+		</div>
+	</form>
 </main>
 
 <style>

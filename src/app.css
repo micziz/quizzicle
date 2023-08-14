@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 body {
-	background: theme(colors.zinc.900);
-	color: white;
+	background: theme(colors.white);
+	color: black;
 }
